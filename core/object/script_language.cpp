@@ -101,6 +101,123 @@ Dictionary Script::_get_script_constant_map() {
 	return ret;
 }
 
+Array Script::_get_script_documentation_list() {
+#ifdef TOOLS_ENABLED
+	Vector<DocData::ClassDoc> classes = get_documentation();
+	Array doc_dicts;
+	for (int idx = 0; idx < classes.size(); idx++) {
+		DocData::ClassDoc p_class = classes[idx];
+		Dictionary json;
+		json["name"] = p_class.name;
+		json["inherits"] = p_class.inherits;
+		json["brief_description"] = p_class.brief_description.strip_edges();
+		json["description"] = p_class.description.strip_edges();
+
+		Array tutorials;
+		for (int i = 0; i < p_class.tutorials.size(); i++) {
+			Dictionary tutorial;
+			tutorial["title"] = p_class.tutorials[i].title;
+			tutorial["link"] = p_class.tutorials[i].link;
+			tutorials.append(tutorial);
+		}
+		json["tutorials"] = tutorials;
+
+		Array constants;
+		for (int i = 0; i < p_class.constants.size(); i++) {
+			Dictionary constant;
+			constant["name"] = p_class.constants[i].name;
+			constant["value"] = p_class.constants[i].value;
+			if (p_class.constants[i].enumeration != "") {
+				constant["enumeration"] = p_class.constants[i].enumeration;
+			}
+			constant["description"] = p_class.constants[i].description.strip_edges();
+			constants.append(constant);
+		}
+		json["constants"] = constants;
+
+		Array signals;
+		for (int i = 0; i < p_class.signals.size(); i++) {
+			Dictionary signal;
+			signal["name"] = p_class.signals[i].name;
+			signal["return_type"] = p_class.signals[i].return_type;
+			if (p_class.signals[i].qualifiers != "") {
+				signal["qualifiers"] = p_class.signals[i].qualifiers;
+			}
+			signal["description"] = p_class.signals[i].description.strip_edges();
+
+			Array arguments;
+			for (int j = 0; j < p_class.signals[i].arguments.size(); j++) {
+				Dictionary argument;
+				argument["name"] = p_class.signals[i].arguments[j].name;
+				if (p_class.signals[i].arguments[j].type != "") {
+					argument["type"] = p_class.signals[i].arguments[j].type;
+				} else {
+					argument["type"] = "Variant";
+				}
+				if (p_class.signals[i].arguments[j].default_value != "") {
+					argument["default_value"] = p_class.signals[i].arguments[j].default_value;
+				}
+				arguments.push_back(argument);
+			}
+			signal["arguments"] = arguments;
+			signals.append(signal);
+		}
+		json["signals"] = signals;
+
+		Array variables;
+		for (int i = 0; i < p_class.properties.size(); i++) {
+			Dictionary var;
+			var["name"] = p_class.properties[i].name;
+			var["type"] = p_class.properties[i].type;
+			var["enumeration"] = p_class.properties[i].enumeration;
+			var["description"] = p_class.properties[i].description.strip_edges();
+			if (p_class.properties[i].default_value != "") {
+				var["default_value"] = p_class.properties[i].default_value;
+			}
+			if (p_class.properties[i].setter != "") {
+				var["setter"] = p_class.properties[i].setter;
+			}
+			if (p_class.properties[i].getter != "") {
+				var["getter"] = p_class.properties[i].getter;
+			}
+			variables.append(var);
+		}
+		json["variables"] = variables;
+
+		Array methods;
+		for (int i = 0; i < p_class.methods.size(); i++) {
+			Dictionary method;
+			method["name"] = p_class.methods[i].name;
+			method["return_type"] = p_class.methods[i].return_type;
+			if (p_class.methods[i].qualifiers != "") {
+				method["qualifiers"] = p_class.methods[i].qualifiers;
+			}
+			method["description"] = p_class.methods[i].description.strip_edges();
+
+			Array arguments;
+			for (int j = 0; j < p_class.methods[i].arguments.size(); j++) {
+				Dictionary argument;
+				argument["name"] = p_class.methods[i].arguments[j].name;
+				argument["type"] = p_class.methods[i].arguments[j].type;
+				if (p_class.methods[i].arguments[j].default_value != "") {
+					argument["default_value"] = p_class.methods[i].arguments[j].default_value;
+				}
+				arguments.push_back(argument);
+			}
+			method["arguments"] = arguments;
+			methods.append(method);
+		}
+		json["methods"] = methods;
+
+		doc_dicts.append(json);
+	}
+
+	return doc_dicts;
+#endif // TOOLS_ENABLED
+
+	return Array();
+}
+
 void Script::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("can_instantiate"), &Script::can_instantiate);
 	//ClassDB::bind_method(D_METHOD("instance_create","base_object"),&Script::instance_create);
@@ -117,6 +234,7 @@ void Script::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_script_property_list"), &Script::_get_script_property_list);
 	ClassDB::bind_method(D_METHOD("get_script_method_list"), &Script::_get_script_method_list);
 	ClassDB::bind_method(D_METHOD("get_script_signal_list"), &Script::_get_script_signal_list);
+	ClassDB::bind_method(D_METHOD("get_script_documentation_list"), &Script::_get_script_documentation_list);
 	ClassDB::bind_method(D_METHOD("get_script_constant_map"), &Script::_get_script_constant_map);
 	ClassDB::bind_method(D_METHOD("get_property_default_value", "property"), &Script::_get_property_default_value);
 
