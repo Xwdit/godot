@@ -61,6 +61,11 @@
 				Returns the list of user signals defined in this [Script].
 			</description>
 		</method>
+		<method name="get_script_documentation_list">
+			<return type="Array" />
+			<description>
+			</description>
+		</method>
 		<method name="has_script_signal" qualifiers="const">
 			<return type="bool" />
 			<argument index="0" name="signal_name" type="StringName" />
