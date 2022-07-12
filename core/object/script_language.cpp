@@ -122,6 +122,15 @@ Array Script::_get_script_documentation_list() {
 		}
 		json["tutorials"] = tutorials;
 
+		Array enums;
+		for (const KeyValue<String, String> &E : p_class.enums) {
+			Dictionary _enum;
+			_enum["name"] = E.key;
+			_enum["description"] = E.value;
+			enums.append(_enum);
+		}
+		json["enums"] = enums;
+
 		Array constants;
 		for (int i = 0; i < p_class.constants.size(); i++) {
 			Dictionary constant;
