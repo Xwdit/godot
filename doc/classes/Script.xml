@@ -43,6 +43,11 @@
 				Returns a dictionary containing constant names and their values.
 			</description>
 		</method>
+		<method name="get_script_documentation_list">
+			<return type="Array" />
+			<description>
+			</description>
+		</method>
 		<method name="get_script_method_list">
 			<return type="Array" />
 			<description>
@@ -59,11 +64,6 @@
 			<return type="Array" />
 			<description>
 				Returns the list of user signals defined in this [Script].
-			</description>
-		</method>
-		<method name="get_script_documentation_list">
-			<return type="Array" />
-			<description>
 			</description>
 		</method>
 		<method name="has_script_signal" qualifiers="const">
