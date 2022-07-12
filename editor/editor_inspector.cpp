@@ -2852,7 +2852,7 @@ void EditorInspector::update_tree() {
 			// Build the doc hint, to use as tooltip.
 
 			// Get the class name.
-			StringName classname = type_name == "" ? object->get_class_name():type_name;
+			StringName classname = type_name == "" ? object->get_class_name() : type_name;
 			if (!object_class.is_empty()) {
 				classname = object_class;
 			}
