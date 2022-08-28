@@ -1870,6 +1870,7 @@ CodeTextEditor::CodeTextEditor() {
 
 	text_editor = memnew(CodeEdit);
 	add_child(text_editor);
+	text_editor->notification(NOTIFICATION_THEME_CHANGED); // To prevent possible crash, theme items need to be initialized directly.
 	text_editor->set_v_size_flags(SIZE_EXPAND_FILL);
 
 	int ot_mode = EditorSettings::get_singleton()->get("interface/editor/code_font_contextual_ligatures");
