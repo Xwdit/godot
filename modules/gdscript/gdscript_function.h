@@ -623,6 +623,7 @@ public:
 	Variant resume(const Variant &p_arg = Variant());
 
 	void _clear_stack();
+	void _clear_connections();
 
 	GDScriptFunctionState();
 	~GDScriptFunctionState();

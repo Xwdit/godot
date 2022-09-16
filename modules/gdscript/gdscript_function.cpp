@@ -289,6 +289,15 @@ void GDScriptFunctionState::_clear_stack() {
 	}
 }
 
+void GDScriptFunctionState::_clear_connections() {
+	List<Object::Connection> connections;
+	get_signals_connected_to_this(&connections);
+
+	for (Object::Connection &c : connections) {
+		c.signal.disconnect(c.callable);
+	}
+}
+
 void GDScriptFunctionState::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("resume", "arg"), &GDScriptFunctionState::resume, DEFVAL(Variant()));
 	ClassDB::bind_method(D_METHOD("is_valid", "extended_check"), &GDScriptFunctionState::is_valid, DEFVAL(false));
