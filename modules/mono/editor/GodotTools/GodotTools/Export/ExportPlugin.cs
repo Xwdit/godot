@@ -139,7 +139,7 @@ namespace GodotTools.Export
                 // Create temporary publish output directory
 
                 string publishOutputTempDir = Path.Combine(Path.GetTempPath(), "godot-publish-dotnet",
-                    $"{Process.GetCurrentProcess().Id}-{buildConfig}-{runtimeIdentifier}");
+                    $"{System.Diagnostics.Process.GetCurrentProcess().Id}-{buildConfig}-{runtimeIdentifier}");
 
                 _tempFolders.Add(publishOutputTempDir);
 
@@ -203,7 +203,7 @@ namespace GodotTools.Export
         {
             base._ExportEnd();
 
-            string aotTempDir = Path.Combine(Path.GetTempPath(), $"godot-aot-{Process.GetCurrentProcess().Id}");
+            string aotTempDir = Path.Combine(Path.GetTempPath(), $"godot-aot-{System.Diagnostics.Process.GetCurrentProcess().Id}");
 
             if (Directory.Exists(aotTempDir))
                 Directory.Delete(aotTempDir, recursive: true);
