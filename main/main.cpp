@@ -89,6 +89,7 @@
 #include "editor/debugger/editor_debugger_node.h"
 #include "editor/doc_data_class_path.gen.h"
 #include "editor/doc_tools.h"
+#include "editor/editor_file_system.h"
 #include "editor/editor_node.h"
 #include "editor/editor_paths.h"
 #include "editor/editor_settings.h"
@@ -3250,6 +3251,7 @@ bool Main::iteration() {
 
 	OS::get_singleton()->add_frame_delay(DisplayServer::get_singleton()->window_can_draw());
 
+	bool should_quit = exit || auto_quit;
 #ifdef TOOLS_ENABLED
 	if (auto_build_solutions) {
 		auto_build_solutions = false;
@@ -3265,9 +3267,15 @@ bool Main::iteration() {
 					"Command line option --build-solutions was passed, but the build callback failed. Aborting.");
 		}
 	}
+
+	if (should_quit && EditorFileSystem::get_singleton()) {
+		if (EditorFileSystem::get_singleton()->is_first_scan() || EditorFileSystem::get_singleton()->is_importing()) {
+			should_quit = false;
+		}
+	}
 #endif
 
-	return exit || auto_quit;
+	return should_quit;
 }
 
 void Main::force_redraw() {
