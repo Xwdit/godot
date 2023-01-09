@@ -37,6 +37,7 @@
 #include "gdscript.h"
 #include "gdscript_analyzer.h"
 #include "gdscript_cache.h"
+#include "gdscript_helper.h"
 #include "gdscript_tokenizer.h"
 #include "gdscript_utility_functions.h"
 
@@ -126,6 +127,8 @@ void initialize_gdscript_module(ModuleInitializationLevel p_level) {
 		gdscript_cache = memnew(GDScriptCache);
 
 		GDScriptUtilityFunctions::register_functions();
+
+		GDREGISTER_CLASS(GDScriptHelper);
 	}
 
 #ifdef TOOLS_ENABLED
