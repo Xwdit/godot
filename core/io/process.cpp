@@ -50,7 +50,7 @@ void Process::_bind_methods() {
 
 Ref<Process> Process::create(const String &p_path, const Vector<String> &p_arguments, const String &p_working_dir, bool p_open_stdin) {
 	if (_create) {
-		if (!p_working_dir.is_empty()) {
+		if (p_working_dir.is_empty()) {
 			return _create(p_path, p_arguments, OS::get_singleton()->get_executable_path().get_base_dir(), p_open_stdin);
 		} else {
 			return _create(p_path, p_arguments, p_working_dir, p_open_stdin);
