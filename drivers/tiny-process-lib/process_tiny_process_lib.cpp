@@ -29,24 +29,77 @@
 /*************************************************************************/
 
 #if defined(UNIX_ENABLED) || defined(WINDOWS_ENABLED)
+#include "core/templates/local_vector.h"
 #include "process_tiny_process_lib.h"
+
+#ifdef WINDOWS_ENABLED
+#include <stringapiset.h>
+#endif
 
 void ProcessTinyProcessLibrary::make_default() {
 	_create = create_tpl;
 }
 
 void ProcessTinyProcessLibrary::_on_stdout(const char *bytes, size_t size) {
-	String line = String(bytes, size);
+#ifdef WINDOWS_ENABLED
+	LocalVector<wchar_t> wchars;
+	int total_wchars = MultiByteToWideChar(CP_ACP, 0, bytes, size, nullptr, 0);
+	if (total_wchars > 0) {
+		wchars.resize(total_wchars);
+		if (MultiByteToWideChar(CP_ACP, 0, bytes, size, wchars.ptr(), total_wchars) == 0) {
+			wchars.clear();
+		}
+	}
+
 	mutex.lock();
-	stdout_lines.append(line);
+	if (wchars.is_empty()) {
+		// Let's hope it's compatible with UTF-8.
+		stdout_lines.append(String::utf8(bytes, size));
+	} else {
+		stdout_lines.append(String(wchars.ptr(), total_wchars));
+	}
 	mutex.unlock();
+#else
+	mutex.lock();
+	String pipe_out;
+	if (pipe_out.parse_utf8(bytes,size) == OK) {
+		stdout_lines.append(pipe_out);
+	} else {
+		stdout_lines.append(String(bytes,size)); // If not valid UTF-8 try decode as Latin-1
+	}
+	mutex.unlock();
+#endif
 }
 
 void ProcessTinyProcessLibrary::_on_stderr(const char *bytes, size_t size) {
-	String line = String(bytes, size);
+#ifdef WINDOWS_ENABLED
+	LocalVector<wchar_t> wchars;
+	int total_wchars = MultiByteToWideChar(CP_ACP, 0, bytes, size, nullptr, 0);
+	if (total_wchars > 0) {
+		wchars.resize(total_wchars);
+		if (MultiByteToWideChar(CP_ACP, 0, bytes, size, wchars.ptr(), total_wchars) == 0) {
+			wchars.clear();
+		}
+	}
+
 	mutex.lock();
-	stderr_lines.append(line);
+	if (wchars.is_empty()) {
+		// Let's hope it's compatible with UTF-8.
+		stderr_lines.append(String::utf8(bytes, size));
+	} else {
+		stderr_lines.append(String(wchars.ptr(), total_wchars));
+	}
 	mutex.unlock();
+#else
+	mutex.lock();
+	String pipe_out;
+	if (pipe_out.parse_utf8(bytes, size) == OK) {
+		stderr_lines.append(pipe_out);
+	} else {
+		stderr_lines.append(String(bytes, size)); // If not valid UTF-8 try decode as Latin-1
+	}
+	mutex.unlock();
+#endif
 }
 
 Ref<Process> ProcessTinyProcessLibrary::create_tpl(const String &p_path, const Vector<String> &p_arguments, const String &p_working_dir, bool p_open_stdin) {
