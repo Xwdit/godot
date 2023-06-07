@@ -469,9 +469,6 @@ void Spout::_bind_methods() {
 
 Spout::Spout() {
 	spout_lib = GetSpout();
-	enable_spout_log();
-	set_spout_log_level(SpoutLogLevel::SPOUT_LOG_VERBOSE);
-
 	send_size = Vector2(100.0f, 100.0f);
 	sender_set_sender_name(String("Godot_Spout"));
 }
