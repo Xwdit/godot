@@ -26,7 +26,7 @@ Error Spout::sender_send_texture(const uint32_t p_godot_texture_id, const uint32
 			: Error::FAILED;
 }
 
-Error Spout::sender_send_image(Ref<Image> p_image, const bool p_invert, const int p_gl_format) {
+Error Spout::sender_send_image(Ref<Image> p_image, const bool p_invert, GLFormat p_gl_format) {
 	const unsigned char *p = (const unsigned char *)p_image->get_data().ptr();
 	return spout_lib->SendImage(p, static_cast<unsigned int>(send_size.x), static_cast<unsigned int>(send_size.y), p_gl_format, p_invert) ? Error::OK : Error::FAILED;
 }
@@ -69,10 +69,23 @@ Error Spout::receiver_receive_texture(int p_godot_texture_id, int p_shared_textu
 	return spout_lib->ReceiveTexture(static_cast<GLuint>(p_shared_texture_id), static_cast<GLuint>(p_godot_texture_id), p_invert, static_cast<GLuint>(p_host_fbo)) ? Error::OK : Error::FAILED;
 }
 
-Error Spout::receiver_receive_image(Ref<Image> p_image, const bool p_invert, const int p_host_fbo, const int p_gl_format) {
-	unsigned char *p = (unsigned char *)p_image->get_data().ptr();
-
-	return spout_lib->ReceiveImage(p, p_gl_format, p_invert, p_host_fbo) ? Error::OK : Error::FAILED;
+Error Spout::receiver_receive_image(Ref<Image> p_image, const bool p_invert, const int p_host_fbo, GLFormat p_gl_format) {
+	PackedByteArray data = p_image->get_data();
+	unsigned char *p = (unsigned char *)data.ptrw();
+	bool result = spout_lib->ReceiveImage(p, p_gl_format, p_invert, p_host_fbo);
+	
+	if (result) {
+        // assign the new data buffer, overwriting to the old specification
+        p_image->set_data(
+            p_image->get_width(),
+            p_image->get_height(),
+            p_image->has_mipmaps(),
+            p_image->get_format(),
+            data
+        );
+    }
+	
+	return result ? Error::OK : Error::FAILED;
 }
 
 bool Spout::receiver_is_updated() {
@@ -382,7 +395,7 @@ void Spout::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("sender_release_sender", "msec"), &Spout::sender_release_sender, DEFVAL(0));
 	ClassDB::bind_method(D_METHOD("sender_send_fbo", "fbo_id"), &Spout::sender_send_fbo);
 	ClassDB::bind_method(D_METHOD("sender_send_texture", "godot_texture_id", "shared_texture_id", "invert", "host_fbo"), &Spout::sender_send_texture, DEFVAL(0), DEFVAL(0), DEFVAL(false), DEFVAL(0));
-	ClassDB::bind_method(D_METHOD("sender_send_image", "image", "invert", "gl_format"), &Spout::sender_send_image, DEFVAL(false), DEFVAL(GL_RGBA));
+	ClassDB::bind_method(D_METHOD("sender_send_image", "image", "invert", "gl_format"), &Spout::sender_send_image, DEFVAL(false), DEFVAL(Spout::FORMAT_RGBA));
 	ClassDB::bind_method(D_METHOD("sender_get_name"), &Spout::sender_get_name);
 	ClassDB::bind_method(D_METHOD("sender_get_fps"), &Spout::sender_get_fps);
 	ClassDB::bind_method(D_METHOD("sender_get_frame"), &Spout::sender_get_frame);
@@ -392,7 +405,7 @@ void Spout::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("receiver_set_receiver_name", "sender_name"), &Spout::receiver_set_receiver_name, DEFVAL(""));
 	ClassDB::bind_method(D_METHOD("receiver_release_receiver"), &Spout::receiver_release_receiver);
 	ClassDB::bind_method(D_METHOD("receiver_receive_texture", "godot_texture_id", "shared_texture_id", "invert", "host_fbo"), &Spout::receiver_receive_texture, DEFVAL(false), DEFVAL(0));
-	ClassDB::bind_method(D_METHOD("receiver_receive_image", "image", "invert", "host_fbo", "gl_format"), &Spout::receiver_receive_image, DEFVAL(false), DEFVAL(0), DEFVAL(GL_RGBA));
+	ClassDB::bind_method(D_METHOD("receiver_receive_image", "image", "invert", "host_fbo", "gl_format"), &Spout::receiver_receive_image, DEFVAL(false), DEFVAL(0), DEFVAL(Spout::FORMAT_RGBA));
 	ClassDB::bind_method(D_METHOD("receiver_is_updated"), &Spout::receiver_is_updated);
 	ClassDB::bind_method(D_METHOD("receiver_is_connected"), &Spout::receiver_is_connected);
 	ClassDB::bind_method(D_METHOD("receiver_is_frame_new"), &Spout::receiver_is_frame_new);
@@ -465,6 +478,10 @@ void Spout::_bind_methods() {
 	BIND_CONSTANT(SPOUT_LOG_WARNING);
 	BIND_CONSTANT(SPOUT_LOG_ERROR);
 	BIND_CONSTANT(SPOUT_LOG_FATAL);
+	
+	BIND_CONSTANT(FORMAT_RGBA);
+    BIND_CONSTANT(FORMAT_BGRA);
+    BIND_CONSTANT(FORMAT_BGRA_EXT);
 }
 
 Spout::Spout() {

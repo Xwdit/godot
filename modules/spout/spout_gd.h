@@ -29,6 +29,12 @@ public:
 		SPOUT_LOG_ERROR = SpoutLibLogLevel::SPOUT_LOG_ERROR,
 		SPOUT_LOG_FATAL = SpoutLibLogLevel::SPOUT_LOG_FATAL
 	};
+	
+	enum GLFormat {
+        FORMAT_RGBA = 0x1908,
+        FORMAT_BGRA = 0x80E1,
+        FORMAT_BGRA_EXT = 0x80E1
+    };
 
 #pragma region Sender
 
@@ -36,7 +42,7 @@ public:
 	void sender_release_sender(int p_msec = 0);
 	Error sender_send_fbo(const uint32_t p_fbo_id);
 	Error sender_send_texture(const uint32_t p_godot_texture_id, const uint32_t p_shared_texture_id, const bool p_invert = true, const int p_host_fbo = 0);
-	Error sender_send_image(Ref<Image> p_image, const bool p_invert = false, const int p_gl_format = GL_RGBA);
+	Error sender_send_image(Ref<Image> p_image, const bool p_invert = false, GLFormat p_gl_format = GLFormat::FORMAT_RGBA);
 	String sender_get_name();
 	double_t sender_get_fps();
 	double_t sender_get_frame();
@@ -50,7 +56,7 @@ public:
 	void receiver_set_receiver_name(const String &p_sender_name = String());
 	void receiver_release_receiver();
 	Error receiver_receive_texture(int p_godot_texture_id = 0, int p_shared_texture_id = 0, bool p_invert = false, int p_host_fbo = 0);
-	Error receiver_receive_image(Ref<Image> p_image, const bool p_invert = false, const int p_host_fbo = 0, const int p_gl_format = GL_RGBA);
+	Error receiver_receive_image(Ref<Image> p_image, const bool p_invert = false, const int p_host_fbo = 0, GLFormat p_gl_format = GLFormat::FORMAT_RGBA);
 	bool receiver_is_updated();
 	bool receiver_is_connected();
 	bool receiver_is_frame_new();
@@ -157,5 +163,6 @@ public:
 };
 
 VARIANT_ENUM_CAST(Spout::SpoutLogLevel);
+VARIANT_ENUM_CAST(Spout::GLFormat);
 
 #endif
