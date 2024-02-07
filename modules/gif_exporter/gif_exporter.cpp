@@ -36,7 +36,7 @@ bool GifExporter::write_frame(const Ref<Image> frame, Color background_color, fl
 		data[i + 2] = (blue * alpha + background_color.get_b8() * 255 * (255 - alpha)) / data[i + 3];
 	}
 	bool _result = ganim.GifWriteFrame(&gwriter, data, frame->get_width(), frame->get_height(), frame_delay, bit_depth, dither);
-	delete data;
+	delete[] data;
 	data = nullptr;
 
 	return _result;

@@ -29,7 +29,6 @@
 /*************************************************************************/
 
 #include "gdscript_helper.h"
-#include "scene\gui\code_edit.h"
 
 void GDScriptHelper::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_validate_code", "code", "script_path"), &GDScriptHelper::set_validate_code, DEFVAL(String()));
@@ -112,7 +111,7 @@ TypedArray<Dictionary> GDScriptHelper::get_completion_options() const {
 	TypedArray<Dictionary> list;
 	for (const ScriptLanguage::CodeCompletionOption &e : r_options) {
 		Dictionary option;
-		option["type"] = (CodeEdit::CodeCompletionKind)e.kind;
+		option["type"] = e.kind;
 		option["display_text"] = e.display;
 		option["insert_text"] = e.insert_text;
 		option["default_value"] = e.default_value;

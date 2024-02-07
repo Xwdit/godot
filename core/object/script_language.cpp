@@ -172,10 +172,10 @@ TypedArray<Dictionary> Script::_get_script_documentation_list() {
 		dict["tutorials"] = tutorials;
 
 		TypedArray<Dictionary> enums;
-		for (const KeyValue<String, String> &E : p_class.enums) {
+		for (const KeyValue<String, DocData::EnumDoc> &E : p_class.enums) {
 			Dictionary _enum;
 			_enum["name"] = E.key;
-			_enum["description"] = E.value;
+			_enum["description"] = E.value.description;
 			enums.append(_enum);
 		}
 		dict["enums"] = enums;
