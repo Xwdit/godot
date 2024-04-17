@@ -4075,7 +4075,7 @@ void EditorNode::update_diff_data_for_node(
 }
 //
 
-void EditorNode::open_request(const String &p_path) {
+void EditorNode::open_request(const String &p_path, bool p_ignore_broken_deps, bool p_set_inherited, bool p_clear_errors, bool p_force_open_imported, bool p_silent_change_tab) {
 	if (!opening_prev) {
 		List<String>::Element *prev_scene_item = previous_scenes.find(p_path);
 		if (prev_scene_item != nullptr) {
@@ -4083,7 +4083,7 @@ void EditorNode::open_request(const String &p_path) {
 		}
 	}
 
-	load_scene(p_path); // As it will be opened in separate tab.
+	load_scene(p_path, p_ignore_broken_deps, p_set_inherited, p_clear_errors, p_force_open_imported, p_silent_change_tab); // As it will be opened in separate tab.
 }
 
 bool EditorNode::has_previous_scenes() const {
