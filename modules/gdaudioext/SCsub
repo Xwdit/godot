@@ -1,0 +1,22 @@
+#!/usr/bin/env python
+
+Import("env")
+Import("env_modules")
+
+env_gdaudioext = env_modules.Clone()
+
+import os
+
+ffmpeg_path = "/opt/homebrew/Cellar/ffmpeg@6/6.1.1_2"  # 使用新编译的静态库路径
+
+env_gdaudioext.Prepend(CPPPATH=[os.path.join(ffmpeg_path, "include")])
+env_gdaudioext.Append(LIBPATH=[os.path.join(ffmpeg_path, "lib")])
+
+ffmpeg_libs = ["z","avfilter", "avformat", "avcodec",  "avutil", "swresample", "swscale"]
+
+# 添加静态库
+env_gdaudioext.Append(LIBS=ffmpeg_libs)
+
+
+# 添加源文件
+env_gdaudioext.add_source_files(env.modules_sources, "*.cpp")
